@@ -58,10 +58,10 @@ services:
 
   asterisk-tts:
     image: gillesfabio/asterisk-google-tts:latest
-  #  environment:
-  #   GOOGLE_APPLICATION_CREDENTIALS_FILE: /run/secrets/tts_key
-    secrets:
-      - tts_key
+  # environment:
+  #  GOOGLE_APPLICATION_CREDENTIALS_FILE: /run/secrets/tts_key
+  # secrets:
+  #   - tts_key
     volumes:
       - asterisk_tts_data:/data
     networks:
@@ -110,5 +110,5 @@ secrets:
     external: true
   smtp_userpwd:
     external: true
-  tts_key:
-    external: true
+  # tts_key:
+  #   external: true
