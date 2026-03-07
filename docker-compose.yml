@@ -1,0 +1,114 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_rpwd
+      MYSQL_DATABASE: asterisk
+      MYSQL_USER: asterisk
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_upwd
+    secrets:
+      - mysql_upwd
+      - mysql_rpwd
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - pbx_network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  freepbx:
+    image: tiredofit/freepbx:latest
+    environment:
+      DB_HOST: mariadb
+      DB_USER: asterisk
+      DB_PASS_FILE: /run/secrets/mysql_upwd
+      DB_NAME: asterisk
+    secrets:
+      - mysql_upwd
+    volumes:
+      - freepbx_etc:/etc/asterisk
+      - freepbx_lib:/var/lib/asterisk
+      - freepbx_voicemail:/var/spool/asterisk/voicemail
+      - freepbx_recordings:/var/spool/asterisk/recordings
+      - freepbx_logs:/var/log/asterisk
+      - freepbx_sounds:/var/lib/asterisk/sounds
+    networks:
+      - pbx_network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: asterisk
+      PMA_PASSWORD_FILE: /run/secrets/mysql_upwd
+    secrets:
+      - mysql_upwd
+    networks:
+      - pbx_network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  asterisk-tts:
+    image: gillesfabio/asterisk-google-tts:latest
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS_FILE: /run/secrets/tts_key
+    secrets:
+      - tts_key
+    volumes:
+      - asterisk_tts_data:/data
+    networks:
+      - pbx_network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  smtp:
+    image: bytemark/smtp:latest
+    environment:
+      MAIL_DOMAIN: example.com
+      SMTP_USER_FILE: /run/secrets/smtp_userpwd
+    secrets:
+      - smtp_userpwd
+    volumes:
+      - smtp_data:/var/mail
+    networks:
+      - pbx_network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  mariadb_data:
+  freepbx_etc:
+  freepbx_lib:
+  freepbx_voicemail:
+  freepbx_recordings:
+  freepbx_logs:
+  freepbx_sounds:
+  phpmyadmin_data:
+  asterisk_tts_data:
+  smtp_data:
+
+networks:
+  pbx_network:
+    external: true
+
+secrets:
+  mysql_upwd:
+    external: true
+  mysql_rpwd:
+    external: true
+  smtp_userpwd:
+    external: true
+  tts_key:
+    external: true
