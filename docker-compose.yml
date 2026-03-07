@@ -12,7 +12,7 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
-      - pbx_network
+      - pbxnet
     deploy:
       replicas: 1
       restart_policy:
@@ -35,7 +35,7 @@ services:
       - freepbx_logs:/var/log/asterisk
       - freepbx_sounds:/var/lib/asterisk/sounds
     networks:
-      - pbx_network
+      - pbxnet
     deploy:
       replicas: 1
       restart_policy:
@@ -50,7 +50,7 @@ services:
     secrets:
       - mysql_upwd
     networks:
-      - pbx_network
+      - pbxnet
     deploy:
       replicas: 1
       restart_policy:
@@ -65,7 +65,7 @@ services:
     volumes:
       - asterisk_tts_data:/data
     networks:
-      - pbx_network
+      - pbxnet
     deploy:
       replicas: 1
       restart_policy:
@@ -81,7 +81,7 @@ services:
     volumes:
       - smtp_data:/var/mail
     networks:
-      - pbx_network
+      - pbxnet
     deploy:
       replicas: 1
       restart_policy:
@@ -100,7 +100,7 @@ volumes:
   smtp_data:
 
 networks:
-  pbx_network:
+  pbxnet:
     external: true
 
 secrets:

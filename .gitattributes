@@ -1,0 +1,2 @@
+# Garante que arquivos .sh sempre usem fim de linha LF (Unix)
+*.sh text eol=lf
