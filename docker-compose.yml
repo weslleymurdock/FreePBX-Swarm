@@ -58,8 +58,8 @@ services:
 
   asterisk-tts:
     image: gillesfabio/asterisk-google-tts:latest
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS_FILE: /run/secrets/tts_key
+  #  environment:
+  #   GOOGLE_APPLICATION_CREDENTIALS_FILE: /run/secrets/tts_key
     secrets:
       - tts_key
     volumes:
@@ -74,7 +74,7 @@ services:
   smtp:
     image: bytemark/smtp:latest
     environment:
-      MAIL_DOMAIN: example.com
+      MAIL_DOMAIN: smpt.gmail.com
       SMTP_USER_FILE: /run/secrets/smtp_userpwd
     secrets:
       - smtp_userpwd
