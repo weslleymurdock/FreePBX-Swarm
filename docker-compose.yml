@@ -74,23 +74,6 @@ services:
         max_attempts: 10
         delay: 10s
 
-  asterisk-tts:
-    image: gillesfabio/asterisk-google-tts:latest
-  # environment:
-  #  GOOGLE_APPLICATION_CREDENTIALS_FILE: /run/secrets/tts_key
-  # secrets:
-  #   - tts_key
-    volumes:
-      - asterisk_tts_data:/data
-    networks:
-      - pbxnet
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        max_attempts: 10
-        delay: 10s
-
   smtp:
     image: bytemark/smtp:latest
     environment:
