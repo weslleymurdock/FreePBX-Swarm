@@ -22,9 +22,13 @@ services:
     image: tiredofit/freepbx:latest
     environment:
       DB_HOST: mariadb
+      DB_PORT: 3306
       DB_USER: asterisk
       DB_PASS_FILE: /run/secrets/mysql_upwd
       DB_NAME: asterisk
+      RTP_START: 10000
+      RTP_FINISH: 20000
+      LANGUAGE: pt_BR
     secrets:
       - mysql_upwd
     volumes:
@@ -36,6 +40,13 @@ services:
       - freepbx_sounds:/var/lib/asterisk/sounds
     networks:
       - pbxnet
+    ports:
+      - "5060:5060/tcp"
+      - "5060:5060/udp"
+      - "4569:4569/tcp"
+      - "4569:4569/udp"
+      - "8001:80"
+      
     deploy:
       replicas: 1
       restart_policy:
