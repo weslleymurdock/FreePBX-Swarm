@@ -53,10 +53,13 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: any
         max_attempts: 10
         delay: 10s
+    tty: true
+    stdin_open: true
 
+  
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     environment:
