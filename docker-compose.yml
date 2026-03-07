@@ -51,6 +51,7 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    command: /usr/sbin/asterisk -f -U asterisk -G asterisk
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
