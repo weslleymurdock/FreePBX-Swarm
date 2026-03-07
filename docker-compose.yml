@@ -26,7 +26,7 @@ services:
       DB_USER: asterisk
       DB_PASS_FILE: /run/secrets/mysql_upwd
       DB_NAME: asterisk
-      RTP_START: 18000
+      RTP_START: 10000
       RTP_FINISH: 20000
       LANGUAGE: pt_BR
     secrets:
@@ -46,7 +46,7 @@ services:
       - "4569:4569/tcp"
       - "4569:4569/udp"
       - "8001:80"
-      - "18000-20000:18000-20000/udp"
+      - "10000-20000:10000-20000/udp"
     deploy:
       replicas: 1
       restart_policy:
