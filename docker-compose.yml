@@ -125,15 +125,27 @@ services:
 
 volumes:
   mariadb_data:
+    driver: local
   freepbx_etc:
+    driver: local
   freepbx_lib:
+    driver: local
   freepbx_voicemail:
+    driver: local
   freepbx_recordings:
+    driver: local
   freepbx_logs:
+    driver: local
   freepbx_sounds:
+    driver: local
   phpmyadmin_data:
+    driver: local
   asterisk_tts_data:
+    driver: local
+  redis_data:
+    driver: local
   smtp_data:
+    driver: local
 
 networks:
   pbxnet:
