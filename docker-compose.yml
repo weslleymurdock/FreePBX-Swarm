@@ -135,10 +135,15 @@ services:
 
   tts:
     image: ghcr.io/coqui-ai/tts:latest
+    environment:
+      OMP_NUM_THREADS: 2
     command: >
-      tts-server
+      python3 -m TTS.server.server
       --model_name tts_models/pt/cv/vits
       --port 5002
+      --use_cuda false
+    volumes:
+      - asterisk_tts_data:/root/.local/share/tts
     ports:
       - "5002:5002"
     networks:
@@ -146,7 +151,6 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-
 
 volumes:
   mariadb_data:
