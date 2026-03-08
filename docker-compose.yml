@@ -23,15 +23,24 @@ services:
 
   freepbx:
     image: tiredofit/freepbx:latest
+    depends_on:
+      - mail
+      - mariadb
+      - phpmyadmin
+      - redis
+      - tts
     environment:
       DB_HOST: mariadb
       DB_PORT: 3306
       DB_USER: asterisk
-      DB_PASS_FILE: /run/secrets/mysql_upwd
+      DB_PASS: asterisk
       DB_NAME: asterisk
       RTP_START: 10000
       RTP_FINISH: 20000
       LANGUAGE: pt_BR
+      ENABLE_XMPP: true
+      ENABLE_SSL: true
+      ENABLE_FOP: true
     secrets:
       - mysql_upwd
     volumes:
@@ -62,6 +71,8 @@ services:
   
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
+    depends_on: 
+      - mariadb
     environment:
       PMA_HOST: mariadb
       PMA_USER: asterisk
@@ -77,14 +88,39 @@ services:
         max_attempts: 10
         delay: 10s
 
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - pbxnet
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  tts:
+    image: ghcr.io/coqui-ai/tts:latest
+    command: >
+      tts-server
+      --model_name tts_models/en/ljspeech/tacotron2-DDC
+      --port 5002
+    ports:
+      - "5002:5002"
+    networks:
+      - pbxnet
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+
   smtp:
     image: bytemark/smtp:latest
     environment:
-      SMTP_HOST: smtp.gmail.com
-      SMTP_PORT: 587
-      SMTP_TLS: 1
-      SMTP_USER_FILE: /run/secrets/smtp_userpwd
-      SMTP_HELO: remotecodehub.com
+      RELAY_HOST: smtp.gmail.com
+      RELAY_PORT: 587
+      RELAY_USERNAME: alice@gmail.com
+      RELAY_PASSWORD: _secretpassword
     secrets:
       - smtp_userpwd
     volumes:
@@ -94,9 +130,7 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
-        max_attempts: 10
-        delay: 10s
+        condition: any
 
 volumes:
   mariadb_data:
