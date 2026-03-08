@@ -3,13 +3,10 @@ services:
   mariadb:
     image: mariadb:latest
     environment:
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_rpwd
-      MYSQL_DATABASE: asterisk
-      MYSQL_USER: asterisk
-      MYSQL_PASSWORD_FILE: /run/secrets/mysql_upwd
-    secrets:
-      - mysql_upwd
-      - mysql_rpwd
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -30,19 +27,17 @@ services:
       - redis
       - tts
     environment:
-      DB_HOST: mariadb
+      DB_HOST: ${DB_HOST}
       DB_PORT: 3306
-      DB_USER: asterisk
-      DB_PASS: asterisk
-      DB_NAME: asterisk
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
       RTP_START: 10000
       RTP_FINISH: 20000
       LANGUAGE: pt_BR
       ENABLE_XMPP: true
       ENABLE_SSL: true
       ENABLE_FOP: true
-    secrets:
-      - mysql_upwd
     volumes:
       - freepbx_etc:/etc/asterisk
       - freepbx_lib:/var/lib/asterisk
@@ -74,11 +69,9 @@ services:
     depends_on: 
       - mariadb
     environment:
-      PMA_HOST: mariadb
-      PMA_USER: asterisk
-      PMA_PASSWORD_FILE: /run/secrets/mysql_upwd
-    secrets:
-      - mysql_upwd
+      PMA_HOST: ${DB_HOST}
+      PMA_USER: ${DB_USER}
+      PMA_PASSWORD: ${DB_PASS}
     networks:
       - pbxnet
     deploy:
@@ -117,12 +110,10 @@ services:
   smtp:
     image: bytemark/smtp:latest
     environment:
-      RELAY_HOST: smtp.gmail.com
+      RELAY_HOST: ${SMPT_HOST}
       RELAY_PORT: 587
-      RELAY_USERNAME: alice@gmail.com
-      RELAY_PASSWORD: _secretpassword
-    secrets:
-      - smtp_userpwd
+      RELAY_USERNAME: ${SMTP_USER}
+      RELAY_PASSWORD: ${SMTP_PASS}
     volumes:
       - smtp_data:/var/mail
     networks:
