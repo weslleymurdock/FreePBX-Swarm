@@ -1,4 +1,73 @@
 services:
+  fail2ban:
+    image: crazymax/fail2ban
+    volumes:
+      - freepbx_logs:/var/log/asterisk:ro
+    networks:
+      - pbxnet
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    deploy:
+      restart_policy:
+        condition: any
+
+  freepbx:
+    image: tiredofit/freepbx:latest
+    depends_on:
+      - fail2ban
+      - mail
+      - mariadb
+      - phpmyadmin
+      - redis
+      - tts
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      ASTERISK_CORE_MAXLOAD: 0.9
+      ASTERISK_CACHE_MEDIA_FRAMES: "yes"
+      TTS_SERVER: http://tts:5002
+      RTP_START: 10000
+      RTP_FINISH: 20000
+      LANGUAGE: pt_BR
+      ENABLE_XMPP: "true"
+      ENABLE_SSL: "true"
+      ENABLE_FOP: "true"
+      REDIS_ENABLED: "true"
+      REDIS_HOST: redis
+    volumes:
+      - freepbx_etc:/etc/asterisk
+      - freepbx_lib:/var/lib/asterisk
+      - freepbx_voicemail:/var/spool/asterisk/voicemail
+      - freepbx_recordings:/var/spool/asterisk/recordings
+      - freepbx_logs:/var/log/asterisk
+      - freepbx_sounds:/var/lib/asterisk/sounds
+    networks:
+      - pbxnet
+    ports:
+      - "5060:5060/tcp"
+      - "5060:5060/udp"
+      - "5160:5160/tcp"
+      - "5160:5160/udp"
+      - "4569:4569/tcp"
+      - "4569:4569/udp"
+      - "8000:80"
+      - "8443:443"
+      - "8001:8001"
+      - "8003:8003"
+      - "8008-8009:8008-8009"
+      - "10000-20000:10000-20000/udp"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 10
+        delay: 10s
+    tty: true
+    stdin_open: true
 
   mariadb:
     image: mariadb:latest
@@ -18,52 +87,6 @@ services:
         max_attempts: 10
         delay: 10s
 
-  freepbx:
-    image: tiredofit/freepbx:latest
-    depends_on:
-      - mail
-      - mariadb
-      - phpmyadmin
-      - redis
-      - tts
-    environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: 3306
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      DB_NAME: ${DB_NAME}
-      RTP_START: 10000
-      RTP_FINISH: 20000
-      LANGUAGE: pt_BR
-      ENABLE_XMPP: "true"
-      ENABLE_SSL: "true"
-      ENABLE_FOP: "true"
-    volumes:
-      - freepbx_etc:/etc/asterisk
-      - freepbx_lib:/var/lib/asterisk
-      - freepbx_voicemail:/var/spool/asterisk/voicemail
-      - freepbx_recordings:/var/spool/asterisk/recordings
-      - freepbx_logs:/var/log/asterisk
-      - freepbx_sounds:/var/lib/asterisk/sounds
-    networks:
-      - pbxnet
-    ports:
-      - "5060:5060/tcp"
-      - "5060:5060/udp"
-      - "4569:4569/tcp"
-      - "4569:4569/udp"
-      - "8001:80"
-      - "10000-20000:10000-20000/udp"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-        max_attempts: 10
-        delay: 10s
-    tty: true
-    stdin_open: true
-
-  
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     depends_on: 
@@ -74,6 +97,8 @@ services:
       PMA_PASSWORD: ${DB_PASS}
     networks:
       - pbxnet
+    ports:
+      - "8002:80"
     deploy:
       replicas: 1
       restart_policy:
@@ -92,21 +117,6 @@ services:
       restart_policy:
         condition: on-failure
 
-  tts:
-    image: ghcr.io/coqui-ai/tts:latest
-    command: >
-      tts-server
-      --model_name tts_models/en/ljspeech/tacotron2-DDC
-      --port 5002
-    ports:
-      - "5002:5002"
-    networks:
-      - pbxnet
-    deploy:
-      restart_policy:
-        condition: on-failure
-
-
   smtp:
     image: bytemark/smtp:latest
     environment:
@@ -122,6 +132,21 @@ services:
       replicas: 1
       restart_policy:
         condition: any
+
+  tts:
+    image: ghcr.io/coqui-ai/tts:latest
+    command: >
+      tts-server
+      --model_name tts_models/pt/cv/vits
+      --port 5002
+    ports:
+      - "5002:5002"
+    networks:
+      - pbxnet
+    deploy:
+      restart_policy:
+        condition: on-failure
+
 
 volumes:
   mariadb_data:
@@ -150,13 +175,4 @@ volumes:
 networks:
   pbxnet:
     external: true
-
-secrets:
-  mysql_upwd:
-    external: true
-  mysql_rpwd:
-    external: true
-  smtp_userpwd:
-    external: true
-  # tts_key:
-  #   external: true
+ 
