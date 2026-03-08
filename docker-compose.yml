@@ -37,7 +37,7 @@ services:
       LANGUAGE: pt_BR
       ENABLE_XMPP: true
       ENABLE_SSL: true
-      ENABLE_FOP: true
+      ENABLE_FOP: "true"
     volumes:
       - freepbx_etc:/etc/asterisk
       - freepbx_lib:/var/lib/asterisk
