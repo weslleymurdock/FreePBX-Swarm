@@ -137,8 +137,8 @@ services:
     image: ghcr.io/coqui-ai/tts:latest
     environment:
       OMP_NUM_THREADS: 2
-    command: >
-      python3 -m TTS.server.server
+    command:  >
+      tts-server
       --model_name tts_models/pt/cv/vits
       --port 5002
       --use_cuda false
