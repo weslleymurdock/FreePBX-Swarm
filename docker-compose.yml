@@ -35,8 +35,8 @@ services:
       RTP_START: 10000
       RTP_FINISH: 20000
       LANGUAGE: pt_BR
-      ENABLE_XMPP: true
-      ENABLE_SSL: true
+      ENABLE_XMPP: "true"
+      ENABLE_SSL: "true"
       ENABLE_FOP: "true"
     volumes:
       - freepbx_etc:/etc/asterisk
