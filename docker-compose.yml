@@ -45,7 +45,8 @@ services:
       - freepbx_recordings:/var/spool/asterisk/recordings
       - freepbx_logs:/var/log/asterisk
       - freepbx_sounds:/var/lib/asterisk/sounds
-      - /root/remote_code
+      - /root/remote_code_hub.png:/var/www/html/admin/images/remote_code_hub.png:ro
+      - /root/rpnv.png:/var/www/html/admin/images/rpnv.png:ro
     networks:
       - pbxnet
     ports:
