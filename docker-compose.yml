@@ -12,7 +12,7 @@ services:
       restart_policy:
         condition: any
 
-  freepbx:
+  pbx:
     image: tiredofit/freepbx:latest
     depends_on:
       - fail2ban
@@ -45,6 +45,7 @@ services:
       - freepbx_recordings:/var/spool/asterisk/recordings
       - freepbx_logs:/var/log/asterisk
       - freepbx_sounds:/var/lib/asterisk/sounds
+      - /root/remote_code
     networks:
       - pbxnet
     ports:
@@ -93,8 +94,7 @@ services:
       - mariadb
     environment:
       PMA_HOST: ${DB_HOST}
-      PMA_USER: ${DB_USER}
-      PMA_PASSWORD: ${DB_PASS}
+      PMA_PORT: 3306
     networks:
       - pbxnet
     ports:
