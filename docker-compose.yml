@@ -137,11 +137,13 @@ services:
     image: ghcr.io/coqui-ai/tts:latest
     environment:
       OMP_NUM_THREADS: 2
+      TTS_USE_GPU: 0        # deshabilita GPU
+      TTS_LANG: pt
     command:  >
-      tts-server
+      python3 TTS/server/server.py
       --model_name tts_models/pt/cv/vits
-      --port 5002
       --use_cuda false
+      --port 5002
     volumes:
       - asterisk_tts_data:/root/.local/share/tts
     ports:
